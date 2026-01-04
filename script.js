@@ -111,7 +111,13 @@ const observer = new IntersectionObserver((entries) => {
 const STORAGE_KEY = 'doughDoughProducts';
 
 function loadProductsFromStorage() {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    // Try localStorage first, then sessionStorage as fallback
+    let stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+        stored = sessionStorage.getItem(STORAGE_KEY);
+        console.log('localStorage empty, trying sessionStorage...');
+    }
+    
     let products = [];
     
     try {

@@ -273,12 +273,18 @@ function saveProducts(products) {
         localStorage.setItem(STORAGE_KEY, jsonString);
         console.log('Saved to localStorage:', STORAGE_KEY, 'Length:', jsonString.length);
         
+        // Also try sessionStorage as backup
+        sessionStorage.setItem(STORAGE_KEY, jsonString);
+        
         // Verify immediately
         const verify = localStorage.getItem(STORAGE_KEY);
         if (!verify) {
             throw new Error('Failed to save to localStorage');
         }
         console.log('Verification successful. Storage contains:', verify.substring(0, 100) + '...');
+        
+        // Show alert with data for manual copy if needed
+        console.log('Products JSON (for debugging):', jsonString);
     } catch (error) {
         console.error('Error in saveProducts:', error);
         throw error;

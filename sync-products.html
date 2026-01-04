@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Products - Dough Dough</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #d4a574;
+        }
+        button {
+            padding: 12px 24px;
+            background: #d4a574;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #8b6f47;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Product Sync Tool</h1>
+        <p>Use this tool to manually sync products between admin panel and main website.</p>
+        
+        <div id="status"></div>
+        
+        <h2>Step 1: Copy from Admin Panel</h2>
+        <p>1. Open the admin panel and open browser console (F12)</p>
+        <p>2. Type: <code>localStorage.getItem('doughDoughProducts')</code></p>
+        <p>3. Copy the result and paste it below:</p>
+        <textarea id="productData" placeholder="Paste product JSON data here..."></textarea>
+        <button onclick="importProducts()">Import Products</button>
+        
+        <h2>Step 2: Export Current Products</h2>
+        <button onclick="exportProducts()">Export Products to Text</button>
+        <textarea id="exportData" readonly placeholder="Exported products will appear here..."></textarea>
+        
+        <h2>Step 3: Check Storage</h2>
+        <button onclick="checkStorage()">Check Current Storage</button>
+        <div id="storageInfo"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'doughDoughProducts';
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + type;
+            statusDiv.textContent = message;
+        }
+
+        function importProducts() {
+            const data = document.getElementById('productData').value.trim();
+            if (!data) {
+                showStatus('Please paste product data first!', 'error');
+                return;
+            }
+
+            try {
+                // Validate JSON
+                const products = JSON.parse(data);
+                
+                // Save to both localStorage and sessionStorage
+                localStorage.setItem(STORAGE_KEY, data);
+                sessionStorage.setItem(STORAGE_KEY, data);
+                
+                showStatus(`Successfully imported ${products.length} product(s)!`, 'success');
+                checkStorage();
+            } catch (e) {
+                showStatus('Error: Invalid JSON data. ' + e.message, 'error');
+            }
+        }
+
+        function exportProducts() {
+            const stored = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                document.getElementById('exportData').value = stored;
+                showStatus('Products exported!', 'success');
+            } else {
+                showStatus('No products found in storage.', 'error');
+            }
+        }
+
+        function checkStorage() {
+            const localData = localStorage.getItem(STORAGE_KEY);
+            const sessionData = sessionStorage.getItem(STORAGE_KEY);
+            
+            const infoDiv = document.getElementById('storageInfo');
+            let html = '<h3>Storage Status:</h3>';
+            html += '<p><strong>localStorage:</strong> ' + (localData ? localData.length + ' characters' : 'Empty') + '</p>';
+            html += '<p><strong>sessionStorage:</strong> ' + (sessionData ? sessionData.length + ' characters' : 'Empty') + '</p>';
+            
+            if (localData) {
+                try {
+                    const products = JSON.parse(localData);
+                    html += '<p><strong>Products in localStorage:</strong> ' + products.length + '</p>';
+                    html += '<ul>';
+                    products.forEach(p => {
+                        html += '<li>' + p.name + ' (' + p.category + ') - $' + p.price + '</li>';
+                    });
+                    html += '</ul>';
+                } catch (e) {
+                    html += '<p style="color: red;">Error parsing localStorage data</p>';
+                }
+            }
+            
+            infoDiv.innerHTML = html;
+        }
+
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', checkStorage);
+    </script>
+</body>
+</html>
+
