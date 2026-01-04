@@ -107,6 +107,86 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
+// Product Loading from Admin Panel
+const STORAGE_KEY = 'doughDoughProducts';
+
+function loadProductsFromStorage() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const products = stored ? JSON.parse(stored) : [];
+    
+    const sweetGrid = document.getElementById('sweet');
+    const savoryGrid = document.getElementById('savory');
+    
+    sweetGrid.innerHTML = '';
+    savoryGrid.innerHTML = '';
+    
+    if (products.length === 0) {
+        // Show default placeholder products if no products exist
+        sweetGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No products available yet. Check back soon!</p>';
+        savoryGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No products available yet. Check back soon!</p>';
+        return;
+    }
+    
+    products.forEach(product => {
+        const card = createProductCard(product);
+        if (product.category === 'sweet') {
+            sweetGrid.appendChild(card);
+        } else if (product.category === 'savory') {
+            savoryGrid.appendChild(card);
+        }
+    });
+    
+    // Re-observe new product cards for animations
+    document.querySelectorAll('.product-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+}
+
+function createProductCard(product) {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    
+    // Determine background class based on category
+    const bgClass = product.category === 'sweet' ? 'sweet-' + (Math.floor(Math.random() * 6) + 1) : 'savory-' + (Math.floor(Math.random() * 6) + 1);
+    
+    // Use first image if available, otherwise use icon
+    let imageContent = '';
+    if (product.images && product.images.length > 0) {
+        imageContent = `<img src="${product.images[0]}" alt="${product.name}" class="product-image">`;
+    } else {
+        imageContent = `<div class="product-icon">${product.icon || '🍞'}</div>`;
+    }
+    
+    card.innerHTML = `
+        <div class="product-image-container ${bgClass}">
+            ${imageContent}
+        </div>
+        <div class="product-info">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            ${product.price ? `<div class="product-price">$${product.price.toFixed(2)}</div>` : ''}
+        </div>
+    `;
+    
+    return card;
+}
+
+// Load products when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    loadProductsFromStorage();
+    
+    // Also observe existing content
+    document.querySelectorAll('.about-content, .contact-content').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+});
+
 // Observe product cards and sections
 document.querySelectorAll('.product-card, .about-content, .contact-content').forEach(el => {
     el.style.opacity = '0';

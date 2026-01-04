@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dough Dough - Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Dough Dough Admin</h1>
+                <p>Please sign in to continue</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                <p class="login-hint">Default: admin / admin123</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="dashboard" class="dashboard hidden">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Dough Dough Admin Panel</h1>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <!-- Products Management -->
+            <section class="admin-section">
+                <div class="section-header">
+                    <h2>Manage Products</h2>
+                    <button id="addProductBtn" class="btn btn-primary">+ Add New Product</button>
+                </div>
+
+                <!-- Product Form Modal -->
+                <div id="productModal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modalTitle">Add New Product</h3>
+                            <button class="modal-close" id="closeModal">&times;</button>
+                        </div>
+                        <form id="productForm" class="product-form">
+                            <input type="hidden" id="productId">
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="productName">Product Name *</label>
+                                    <input type="text" id="productName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productCategory">Category *</label>
+                                    <select id="productCategory" required>
+                                        <option value="sweet">Sweet Treats</option>
+                                        <option value="savory">Savory Delights</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productDescription">Description *</label>
+                                <textarea id="productDescription" rows="3" required></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="productPrice">Price *</label>
+                                    <input type="number" id="productPrice" step="0.01" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productIcon">Icon Emoji</label>
+                                    <input type="text" id="productIcon" placeholder="🎂" maxlength="2">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productImages">Product Images</label>
+                                <div class="image-upload-area">
+                                    <input type="file" id="productImages" accept="image/*" multiple>
+                                    <div class="upload-preview" id="imagePreview"></div>
+                                </div>
+                                <div class="existing-images" id="existingImages"></div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Products List -->
+                <div class="products-list" id="productsList">
+                    <!-- Products will be loaded here -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
+
