@@ -71,6 +71,23 @@
                 <button class="tab-btn active" data-tab="sweet">Sweet Treats</button>
                 <button class="tab-btn" data-tab="savory">Savory Delights</button>
                 <button class="tab-btn refresh-btn" id="refreshProducts" title="Refresh Products" style="margin-left: auto; padding: 8px 15px; font-size: 0.9rem;">🔄 Refresh</button>
+                <button class="tab-btn refresh-btn" id="importProductsBtn" title="Import Products" style="padding: 8px 15px; font-size: 0.9rem;">📥 Import</button>
+            </div>
+            
+            <!-- Import Modal -->
+            <div id="importModal" class="import-modal hidden">
+                <div class="import-modal-content">
+                    <div class="import-modal-header">
+                        <h3>Import Products</h3>
+                        <button class="import-modal-close" id="closeImportModal">&times;</button>
+                    </div>
+                    <p>Paste the product data from the admin panel export button:</p>
+                    <textarea id="importData" placeholder="Paste product JSON data here..."></textarea>
+                    <div class="import-modal-actions">
+                        <button class="btn btn-secondary" id="cancelImportBtn">Cancel</button>
+                        <button class="btn btn-primary" id="confirmImportBtn">Import</button>
+                    </div>
+                </div>
             </div>
             
             <!-- Sweet Products -->
