@@ -112,10 +112,18 @@ const STORAGE_KEY = 'doughDoughProducts';
 
 function loadProductsFromStorage() {
     const stored = localStorage.getItem(STORAGE_KEY);
-    const products = stored ? JSON.parse(stored) : [];
+    let products = [];
+    
+    try {
+        products = stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        console.error('Error parsing products from storage:', e);
+        products = [];
+    }
     
     console.log('Loading products:', products.length, 'found');
-    console.log('Raw storage data:', localStorage.getItem(STORAGE_KEY));
+    console.log('Raw storage data:', stored ? stored.substring(0, 200) + '...' : 'null');
+    console.log('Storage key:', STORAGE_KEY);
     
     const sweetGrid = document.getElementById('sweet');
     const savoryGrid = document.getElementById('savory');
@@ -140,14 +148,34 @@ function loadProductsFromStorage() {
     console.log('Sweet products:', products.filter(p => p.category === 'sweet'));
     console.log('Savory products:', products.filter(p => p.category === 'savory'));
     
+    let sweetCount = 0;
+    let savoryCount = 0;
+    
     products.forEach(product => {
+        console.log('Processing product:', product.name, 'Category:', product.category);
         const card = createProductCard(product);
         if (product.category === 'sweet') {
             sweetGrid.appendChild(card);
+            sweetCount++;
+            console.log('Added to sweet grid:', product.name);
         } else if (product.category === 'savory') {
             savoryGrid.appendChild(card);
+            savoryCount++;
+            console.log('Added to savory grid:', product.name);
+        } else {
+            console.warn('Product has unknown category:', product.category, product);
         }
     });
+    
+    console.log('Total products displayed - Sweet:', sweetCount, 'Savory:', savoryCount);
+    
+    // If no products in active tab, show message
+    if (sweetCount === 0 && document.getElementById('sweet').classList.contains('active')) {
+        sweetGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No sweet products available yet.</p>';
+    }
+    if (savoryCount === 0 && document.getElementById('savory').classList.contains('active')) {
+        savoryGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No savory products available yet.</p>';
+    }
     
     // Observe new product cards for animations after a short delay
     setTimeout(() => {
