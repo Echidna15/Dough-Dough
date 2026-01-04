@@ -200,45 +200,65 @@ productForm.addEventListener('submit', (e) => {
 });
 
 function saveProduct() {
-    const products = getProducts();
-    const productData = {
-        id: currentProductId || Date.now(),
-        name: document.getElementById('productName').value,
-        category: document.getElementById('productCategory').value,
-        description: document.getElementById('productDescription').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        icon: document.getElementById('productIcon').value || '🍞',
-        images: []
-    };
+    try {
+        const products = getProducts();
+        const productData = {
+            id: currentProductId || Date.now(),
+            name: document.getElementById('productName').value,
+            category: document.getElementById('productCategory').value,
+            description: document.getElementById('productDescription').value,
+            price: parseFloat(document.getElementById('productPrice').value),
+            icon: document.getElementById('productIcon').value || '🍞',
+            images: []
+        };
 
-    // Add existing images (excluding removed ones)
-    if (currentProductId) {
-        const existingProduct = products.find(p => p.id === currentProductId);
-        if (existingProduct && existingProduct.images) {
-            productData.images = existingProduct.images.filter(img => 
-                !imagesToRemove.includes(img)
-            );
+        console.log('Saving product:', productData);
+
+        // Add existing images (excluding removed ones)
+        if (currentProductId) {
+            const existingProduct = products.find(p => p.id === currentProductId);
+            if (existingProduct && existingProduct.images) {
+                productData.images = existingProduct.images.filter(img => 
+                    !imagesToRemove.includes(img)
+                );
+            }
         }
-    }
 
-    // Add new images
-    newImages.forEach(image => {
-        productData.images.push(image.dataUrl);
-    });
+        // Add new images
+        newImages.forEach(image => {
+            productData.images.push(image.dataUrl);
+        });
 
-    // Save or update product
-    if (currentProductId) {
-        const index = products.findIndex(p => p.id === currentProductId);
-        if (index !== -1) {
-            products[index] = productData;
+        // Save or update product
+        if (currentProductId) {
+            const index = products.findIndex(p => p.id === currentProductId);
+            if (index !== -1) {
+                products[index] = productData;
+            }
+        } else {
+            products.push(productData);
         }
-    } else {
-        products.push(productData);
-    }
 
-    saveProducts(products);
-    closeProductModal();
-    loadProducts();
+        console.log('Products array before save:', products);
+        saveProducts(products);
+        console.log('Products saved. Verifying...', localStorage.getItem(STORAGE_KEY));
+        
+        // Verify save
+        const verify = getProducts();
+        console.log('Verification - products in storage:', verify.length);
+        
+        if (verify.length === 0) {
+            alert('Error: Product was not saved! Check console for details.');
+            return;
+        }
+        
+        alert('Product saved successfully!');
+        closeProductModal();
+        loadProducts();
+    } catch (error) {
+        console.error('Error saving product:', error);
+        alert('Error saving product: ' + error.message);
+    }
 }
 
 // Get/Save Products
@@ -248,7 +268,21 @@ function getProducts() {
 }
 
 function saveProducts(products) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    try {
+        const jsonString = JSON.stringify(products);
+        localStorage.setItem(STORAGE_KEY, jsonString);
+        console.log('Saved to localStorage:', STORAGE_KEY, 'Length:', jsonString.length);
+        
+        // Verify immediately
+        const verify = localStorage.getItem(STORAGE_KEY);
+        if (!verify) {
+            throw new Error('Failed to save to localStorage');
+        }
+        console.log('Verification successful. Storage contains:', verify.substring(0, 100) + '...');
+    } catch (error) {
+        console.error('Error in saveProducts:', error);
+        throw error;
+    }
 }
 
 // Load and Display Products
