@@ -226,12 +226,12 @@ function createProductCard(product) {
 
 // Refresh button and Import Modal
 let refreshBtn = null;
-const importModal = document.getElementById('importModal');
-const importProductsBtn = document.getElementById('importProductsBtn');
-const closeImportModal = document.getElementById('closeImportModal');
-const cancelImportBtn = document.getElementById('cancelImportBtn');
-const confirmImportBtn = document.getElementById('confirmImportBtn');
-const importData = document.getElementById('importData');
+let importModal = null;
+let importProductsBtn = null;
+let closeImportModal = null;
+let cancelImportBtn = null;
+let confirmImportBtn = null;
+let importData = null;
 
 // Load products when page loads
 window.addEventListener('DOMContentLoaded', () => {
@@ -268,11 +268,35 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Get import modal elements
+    importModal = document.getElementById('importModal');
+    importProductsBtn = document.getElementById('importProductsBtn');
+    closeImportModal = document.getElementById('closeImportModal');
+    cancelImportBtn = document.getElementById('cancelImportBtn');
+    confirmImportBtn = document.getElementById('confirmImportBtn');
+    importData = document.getElementById('importData');
+    
+    console.log('Import elements:', {
+        modal: importModal,
+        importBtn: importProductsBtn,
+        closeBtn: closeImportModal,
+        cancelBtn: cancelImportBtn,
+        confirmBtn: confirmImportBtn,
+        dataField: importData
+    });
+    
     // Import button
     if (importProductsBtn) {
         importProductsBtn.addEventListener('click', () => {
-            importModal.classList.remove('hidden');
+            console.log('Open import modal clicked');
+            if (importModal) {
+                importModal.classList.remove('hidden');
+            } else {
+                alert('Import modal not found');
+            }
         });
+    } else {
+        console.error('Import products button not found');
     }
     
     // Close import modal
@@ -286,7 +310,18 @@ window.addEventListener('DOMContentLoaded', () => {
     // Confirm import
     if (confirmImportBtn) {
         confirmImportBtn.addEventListener('click', () => {
-            const data = importData.value.trim();
+            console.log('Import button clicked');
+            const dataElement = document.getElementById('importData');
+            if (!dataElement) {
+                console.error('importData element not found');
+                alert('Error: Import textarea not found');
+                return;
+            }
+            
+            const data = dataElement.value.trim();
+            console.log('Data length:', data.length);
+            console.log('Data preview:', data.substring(0, 100));
+            
             if (!data) {
                 alert('Please paste product data first!');
                 return;
@@ -294,18 +329,33 @@ window.addEventListener('DOMContentLoaded', () => {
             
             try {
                 const products = JSON.parse(data);
+                console.log('Parsed products:', products);
+                
                 if (!Array.isArray(products)) {
                     throw new Error('Data is not an array');
                 }
                 
-                localStorage.setItem(STORAGE_KEY, data);
-                sessionStorage.setItem(STORAGE_KEY, data);
+                if (products.length === 0) {
+                    throw new Error('No products in the data');
+                }
                 
-                alert(`Successfully imported ${products.length} product(s)!`);
+                const jsonString = JSON.stringify(products);
+                localStorage.setItem(STORAGE_KEY, jsonString);
+                sessionStorage.setItem(STORAGE_KEY, jsonString);
+                
+                // Verify save
+                const verify = localStorage.getItem(STORAGE_KEY);
+                if (!verify) {
+                    throw new Error('Failed to save to localStorage');
+                }
+                
+                console.log('Products saved successfully');
+                alert(`✅ Successfully imported ${products.length} product(s)!`);
                 closeImportModalFunc();
                 loadProductsFromStorage();
             } catch (e) {
-                alert('Error: ' + e.message);
+                console.error('Import error:', e);
+                alert('Error: ' + e.message + '\n\nCheck the console (F12) for details.');
             }
         });
     }
