@@ -115,12 +115,13 @@ function loadProductsFromStorage() {
     const products = stored ? JSON.parse(stored) : [];
     
     console.log('Loading products:', products.length, 'found');
+    console.log('Raw storage data:', localStorage.getItem(STORAGE_KEY));
     
     const sweetGrid = document.getElementById('sweet');
     const savoryGrid = document.getElementById('savory');
     
     if (!sweetGrid || !savoryGrid) {
-        console.error('Product grids not found');
+        console.error('Product grids not found! sweetGrid:', sweetGrid, 'savoryGrid:', savoryGrid);
         return;
     }
     
@@ -128,6 +129,7 @@ function loadProductsFromStorage() {
     savoryGrid.innerHTML = '';
     
     if (products.length === 0) {
+        console.log('No products found in storage');
         // Show default placeholder products if no products exist
         sweetGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No products available yet. Check back soon!</p>';
         savoryGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No products available yet. Check back soon!</p>';
@@ -135,6 +137,8 @@ function loadProductsFromStorage() {
     }
     
     console.log('Products to display:', products);
+    console.log('Sweet products:', products.filter(p => p.category === 'sweet'));
+    console.log('Savory products:', products.filter(p => p.category === 'savory'));
     
     products.forEach(product => {
         const card = createProductCard(product);
@@ -185,9 +189,24 @@ function createProductCard(product) {
     return card;
 }
 
+// Refresh button
+let refreshBtn = null;
+
 // Load products when page loads
 window.addEventListener('DOMContentLoaded', () => {
-    loadProductsFromStorage();
+    // Small delay to ensure DOM is fully ready
+    setTimeout(() => {
+        loadProductsFromStorage();
+    }, 50);
+    
+    // Add refresh button listener
+    refreshBtn = document.getElementById('refreshProducts');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            loadProductsFromStorage();
+            alert('Products refreshed!');
+        });
+    }
     
     // Observe existing content sections
     document.querySelectorAll('.about-content, .contact-content').forEach(el => {
@@ -197,4 +216,12 @@ window.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
+
+// Also listen for storage changes (in case admin panel updates products)
+window.addEventListener('storage', () => {
+    loadProductsFromStorage();
+});
+
+// Make loadProductsFromStorage available globally for debugging
+window.loadProductsFromStorage = loadProductsFromStorage;
 
