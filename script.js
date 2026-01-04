@@ -309,8 +309,12 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Confirm import
     if (confirmImportBtn) {
-        confirmImportBtn.addEventListener('click', () => {
-            console.log('Import button clicked');
+        console.log('Setting up import button handler');
+        confirmImportBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Import button clicked!');
+            
             const dataElement = document.getElementById('importData');
             if (!dataElement) {
                 console.error('importData element not found');
@@ -328,6 +332,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             
             try {
+                console.log('Attempting to parse JSON...');
                 const products = JSON.parse(data);
                 console.log('Parsed products:', products);
                 
@@ -339,6 +344,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     throw new Error('No products in the data');
                 }
                 
+                console.log('Saving products to storage...');
                 const jsonString = JSON.stringify(products);
                 localStorage.setItem(STORAGE_KEY, jsonString);
                 sessionStorage.setItem(STORAGE_KEY, jsonString);
@@ -349,15 +355,19 @@ window.addEventListener('DOMContentLoaded', () => {
                     throw new Error('Failed to save to localStorage');
                 }
                 
-                console.log('Products saved successfully');
+                console.log('Products saved successfully! Count:', products.length);
                 alert(`✅ Successfully imported ${products.length} product(s)!`);
                 closeImportModalFunc();
                 loadProductsFromStorage();
             } catch (e) {
                 console.error('Import error:', e);
+                console.error('Error stack:', e.stack);
                 alert('Error: ' + e.message + '\n\nCheck the console (F12) for details.');
             }
         });
+        console.log('Import button handler attached');
+    } else {
+        console.error('confirmImportBtn not found!');
     }
     
     // Close modal when clicking outside
