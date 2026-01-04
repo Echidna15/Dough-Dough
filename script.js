@@ -128,8 +128,9 @@ function loadProductsFromStorage() {
     }
     
     console.log('Loading products:', products.length, 'found');
-    console.log('Raw storage data:', stored ? stored.substring(0, 200) + '...' : 'null');
+    console.log('Raw storage data:', stored ? (stored.length > 200 ? stored.substring(0, 200) + '...' : stored) : 'null');
     console.log('Storage key:', STORAGE_KEY);
+    console.log('All localStorage keys:', Object.keys(localStorage));
     
     const sweetGrid = document.getElementById('sweet');
     const savoryGrid = document.getElementById('savory');
@@ -237,12 +238,27 @@ window.addEventListener('DOMContentLoaded', () => {
     refreshBtn = document.getElementById('refreshProducts');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
+            console.log('Refresh button clicked');
+            const beforeCount = document.querySelectorAll('.product-card').length;
+            console.log('Products before refresh:', beforeCount);
             loadProductsFromStorage();
+            const afterCount = document.querySelectorAll('.product-card').length;
+            console.log('Products after refresh:', afterCount);
+            
             // Show visual feedback
+            const originalText = refreshBtn.textContent;
             refreshBtn.textContent = '✓ Refreshed!';
             setTimeout(() => {
-                refreshBtn.textContent = '🔄 Refresh';
+                refreshBtn.textContent = originalText;
             }, 2000);
+            
+            // Alert if no products found
+            if (afterCount === 0) {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (!stored) {
+                    alert('No products found in storage.\n\nPlease:\n1. Go to Admin Panel\n2. Click "📋 Export Products"\n3. Click "📥 Import" here\n4. Paste the data');
+                }
+            }
         });
     }
     
