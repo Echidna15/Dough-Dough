@@ -149,9 +149,19 @@
                 document.getElementById('productData').value = data;
                 showStatus('Products copied! Now click "Import Products" to save.', 'success');
             } else {
-                showStatus('No products found in current storage. Make sure you have products saved in the admin panel first.', 'error');
+                showStatus('No products found in current storage. Please use the "📋 Export Products" button in the admin panel instead, then paste the data here.', 'error');
             }
         }
+        
+        // Try to paste from clipboard
+        document.getElementById('productData').addEventListener('paste', (e) => {
+            setTimeout(() => {
+                const pasted = e.target.value;
+                if (pasted && pasted.trim().startsWith('[')) {
+                    showStatus('Data pasted! Click "Import Products" to save.', 'info');
+                }
+            }, 100);
+        });
 
         function checkStorage() {
             const localData = localStorage.getItem(STORAGE_KEY);
