@@ -357,6 +357,28 @@ function deleteProduct(id) {
 }
 
 // Make functions globally available
+// Export Products Button
+const exportProductsBtn = document.getElementById('exportProductsBtn');
+if (exportProductsBtn) {
+    exportProductsBtn.addEventListener('click', () => {
+        const products = getProducts();
+        if (products.length === 0) {
+            alert('No products to export!');
+            return;
+        }
+        
+        const jsonData = JSON.stringify(products);
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(jsonData).then(() => {
+            alert(`✅ Copied ${products.length} product(s) to clipboard!\n\nNow go to the sync tool and paste it.`);
+        }).catch(() => {
+            // Fallback: show in prompt
+            prompt('Copy this data (Ctrl+C):', jsonData);
+        });
+    });
+}
+
 window.removeNewImage = removeNewImage;
 window.removeExistingImage = removeExistingImage;
 window.editProduct = editProduct;
