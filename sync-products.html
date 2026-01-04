@@ -73,10 +73,17 @@
         <div id="status"></div>
         
         <h2>Step 1: Copy from Admin Panel</h2>
-        <p>1. Open the admin panel and open browser console (F12)</p>
-        <p>2. Type: <code>localStorage.getItem('doughDoughProducts')</code></p>
-        <p>3. Copy the result and paste it below:</p>
-        <textarea id="productData" placeholder="Paste product JSON data here..."></textarea>
+        <p><strong>Method 1 - Using Console:</strong></p>
+        <ol>
+            <li>Open the admin panel and open browser console (F12)</li>
+            <li>Type: <code>allow pasting</code> (then press Enter)</li>
+            <li>Type: <code>localStorage.getItem('doughDoughProducts')</code></li>
+            <li>Copy the result and paste it below</li>
+        </ol>
+        <p><strong>Method 2 - Direct Copy (Easier!):</strong></p>
+        <p>Click the button below to automatically copy products from admin panel storage:</p>
+        <button onclick="copyFromAdmin()">📋 Copy Products from Admin Panel</button>
+        <textarea id="productData" placeholder="Paste product JSON data here, or use the copy button above..."></textarea>
         <button onclick="importProducts()">Import Products</button>
         
         <h2>Step 2: Export Current Products</h2>
@@ -126,6 +133,23 @@
                 showStatus('Products exported!', 'success');
             } else {
                 showStatus('No products found in storage.', 'error');
+            }
+        }
+
+        function copyFromAdmin() {
+            // Try to get from localStorage first
+            let data = localStorage.getItem(STORAGE_KEY);
+            
+            if (!data) {
+                // Try sessionStorage
+                data = sessionStorage.getItem(STORAGE_KEY);
+            }
+            
+            if (data) {
+                document.getElementById('productData').value = data;
+                showStatus('Products copied! Now click "Import Products" to save.', 'success');
+            } else {
+                showStatus('No products found in current storage. Make sure you have products saved in the admin panel first.', 'error');
             }
         }
 
