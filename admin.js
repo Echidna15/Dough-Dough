@@ -252,7 +252,7 @@ function saveProduct() {
             return;
         }
         
-        alert('Product saved successfully!');
+        alert(`Product saved successfully!\n\n⚠️ Remember to refresh the main website page to see your changes.`);
         closeProductModal();
         loadProducts();
     } catch (error) {

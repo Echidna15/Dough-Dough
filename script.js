@@ -230,6 +230,24 @@ window.addEventListener('DOMContentLoaded', () => {
         loadProductsFromStorage();
     }, 50);
     
+    // Listen for storage changes (when admin panel updates products)
+    window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY) {
+            console.log('Storage changed, reloading products...');
+            loadProductsFromStorage();
+        }
+    });
+    
+    // Also check periodically for changes (for same-window updates)
+    setInterval(() => {
+        const currentData = localStorage.getItem(STORAGE_KEY);
+        if (currentData && currentData !== lastKnownData) {
+            console.log('Products updated, reloading...');
+            loadProductsFromStorage();
+            lastKnownData = currentData;
+        }
+    }, 2000); // Check every 2 seconds
+    
     // Observe existing content sections
     document.querySelectorAll('.about-content, .contact-content').forEach(el => {
         el.style.opacity = '0';
@@ -238,6 +256,8 @@ window.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
+
+let lastKnownData = localStorage.getItem(STORAGE_KEY);
 
 // Also listen for storage changes (in case admin panel updates products)
 window.addEventListener('storage', () => {
