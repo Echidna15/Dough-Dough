@@ -224,8 +224,14 @@ function createProductCard(product) {
     return card;
 }
 
-// Refresh button
+// Refresh button and Import Modal
 let refreshBtn = null;
+const importModal = document.getElementById('importModal');
+const importProductsBtn = document.getElementById('importProductsBtn');
+const closeImportModal = document.getElementById('closeImportModal');
+const cancelImportBtn = document.getElementById('cancelImportBtn');
+const confirmImportBtn = document.getElementById('confirmImportBtn');
+const importData = document.getElementById('importData');
 
 // Load products when page loads
 window.addEventListener('DOMContentLoaded', () => {
@@ -256,8 +262,59 @@ window.addEventListener('DOMContentLoaded', () => {
             if (afterCount === 0) {
                 const stored = localStorage.getItem(STORAGE_KEY);
                 if (!stored) {
-                    alert('No products found in storage.\n\nPlease:\n1. Go to Admin Panel\n2. Click "📋 Export Products"\n3. Click "📥 Import" here\n4. Paste the data');
+                    alert('No products found in storage.\n\nPlease:\n1. Go to Admin Panel\n2. Click "📋 Export Products"\n3. Click "📥 Import" button here\n4. Paste the data');
                 }
+            }
+        });
+    }
+    
+    // Import button
+    if (importProductsBtn) {
+        importProductsBtn.addEventListener('click', () => {
+            importModal.classList.remove('hidden');
+        });
+    }
+    
+    // Close import modal
+    if (closeImportModal) {
+        closeImportModal.addEventListener('click', closeImportModalFunc);
+    }
+    if (cancelImportBtn) {
+        cancelImportBtn.addEventListener('click', closeImportModalFunc);
+    }
+    
+    // Confirm import
+    if (confirmImportBtn) {
+        confirmImportBtn.addEventListener('click', () => {
+            const data = importData.value.trim();
+            if (!data) {
+                alert('Please paste product data first!');
+                return;
+            }
+            
+            try {
+                const products = JSON.parse(data);
+                if (!Array.isArray(products)) {
+                    throw new Error('Data is not an array');
+                }
+                
+                localStorage.setItem(STORAGE_KEY, data);
+                sessionStorage.setItem(STORAGE_KEY, data);
+                
+                alert(`Successfully imported ${products.length} product(s)!`);
+                closeImportModalFunc();
+                loadProductsFromStorage();
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        });
+    }
+    
+    // Close modal when clicking outside
+    if (importModal) {
+        importModal.addEventListener('click', (e) => {
+            if (e.target === importModal) {
+                closeImportModalFunc();
             }
         });
     }
