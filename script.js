@@ -115,3 +115,124 @@ document.querySelectorAll('.product-card, .about-content, .contact-content').for
     observer.observe(el);
 });
 
+// Image Gallery Modal Functionality
+const modal = document.getElementById('imageModal');
+const modalImage = document.getElementById('modalImage');
+const modalThumbnails = document.getElementById('modalThumbnails');
+const closeModal = document.querySelector('.modal-close');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+// Product images mapping
+const productImages = {
+    1: ['1 main.jpg', '1 second.jpg', '1 third.jpg'],
+    2: ['2 main.jpg', '2 second.jpg', '2 third.jpg'],
+    3: ['3 main.jpg', '3 second.jpg'],
+    4: ['4 main.jpg', '4 second.jpg', '4 third.jpg'],
+    5: ['5 main.jpg', '5 second.jpg'],
+    6: ['6 main.jpg', '6 second.jpg'],
+    7: ['7 main.jpg', '7 second.jpg', '7 third.jpg'],
+    8: ['8 main.jpg', '8 second.jpg', '8 third.jpg'],
+    9: ['9 main.jpg', '9 second.jpg', '9 third.jpg']
+};
+
+let currentProduct = null;
+let currentImageIndex = 0;
+let currentImages = [];
+
+// Open modal with product images
+function openModal(productNumber) {
+    currentProduct = productNumber;
+    currentImages = productImages[productNumber] || [];
+    currentImageIndex = 0;
+    
+    if (currentImages.length > 0) {
+        updateModalImage();
+        updateThumbnails();
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Update modal image
+function updateModalImage() {
+    if (currentImages.length > 0) {
+        modalImage.src = currentImages[currentImageIndex];
+        modalImage.alt = `Product ${currentProduct} - Image ${currentImageIndex + 1}`;
+    }
+}
+
+// Update thumbnails
+function updateThumbnails() {
+    modalThumbnails.innerHTML = '';
+    currentImages.forEach((image, index) => {
+        const thumbnail = document.createElement('img');
+        thumbnail.src = image;
+        thumbnail.className = 'modal-thumbnail' + (index === currentImageIndex ? ' active' : '');
+        thumbnail.alt = `Thumbnail ${index + 1}`;
+        thumbnail.addEventListener('click', () => {
+            currentImageIndex = index;
+            updateModalImage();
+            updateThumbnails();
+        });
+        modalThumbnails.appendChild(thumbnail);
+    });
+}
+
+// Close modal
+function closeModalFunc() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Navigate images
+function nextImage() {
+    if (currentImages.length > 0) {
+        currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+        updateModalImage();
+        updateThumbnails();
+    }
+}
+
+function prevImage() {
+    if (currentImages.length > 0) {
+        currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+        updateModalImage();
+        updateThumbnails();
+    }
+}
+
+// Event listeners
+document.querySelectorAll('.product-card').forEach(card => {
+    const productNumber = parseInt(card.getAttribute('data-product'));
+    if (productNumber) {
+        card.addEventListener('click', () => {
+            openModal(productNumber);
+        });
+    }
+});
+
+closeModal.addEventListener('click', closeModalFunc);
+prevBtn.addEventListener('click', prevImage);
+nextBtn.addEventListener('click', nextImage);
+
+// Close modal when clicking outside
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        closeModalFunc();
+    }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    if (modal.classList.contains('active')) {
+        if (e.key === 'Escape') {
+            closeModalFunc();
+        } else if (e.key === 'ArrowLeft') {
+            prevImage();
+        } else if (e.key === 'ArrowRight') {
+            nextImage();
+        }
+    }
+});
+
