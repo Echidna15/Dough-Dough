@@ -117,6 +117,11 @@ function loadProductsFromStorage() {
     const sweetGrid = document.getElementById('sweet');
     const savoryGrid = document.getElementById('savory');
     
+    if (!sweetGrid || !savoryGrid) {
+        console.error('Product grids not found');
+        return;
+    }
+    
     sweetGrid.innerHTML = '';
     savoryGrid.innerHTML = '';
     
@@ -136,13 +141,15 @@ function loadProductsFromStorage() {
         }
     });
     
-    // Re-observe new product cards for animations
-    document.querySelectorAll('.product-card').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-    });
+    // Observe new product cards for animations after a short delay
+    setTimeout(() => {
+        document.querySelectorAll('.product-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    }, 100);
 }
 
 function createProductCard(product) {
@@ -178,20 +185,12 @@ function createProductCard(product) {
 window.addEventListener('DOMContentLoaded', () => {
     loadProductsFromStorage();
     
-    // Also observe existing content
+    // Observe existing content sections
     document.querySelectorAll('.about-content, .contact-content').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
     });
-});
-
-// Observe product cards and sections
-document.querySelectorAll('.product-card, .about-content, .contact-content').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
 });
 
