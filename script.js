@@ -310,10 +310,25 @@ window.addEventListener('DOMContentLoaded', () => {
     // Confirm import
     if (confirmImportBtn) {
         console.log('Setting up import button handler');
+        console.log('Button element:', confirmImportBtn);
+        console.log('Button style:', window.getComputedStyle(confirmImportBtn));
+        
+        // Test click
+        confirmImportBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Import button clicked via onclick!');
+            handleImport();
+        };
+        
         confirmImportBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Import button clicked!');
+            console.log('Import button clicked via addEventListener!');
+            handleImport();
+        }, true); // Use capture phase
+        
+        function handleImport() {
             
             const dataElement = document.getElementById('importData');
             if (!dataElement) {
@@ -364,7 +379,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 console.error('Error stack:', e.stack);
                 alert('Error: ' + e.message + '\n\nCheck the console (F12) for details.');
             }
-        });
+        }
+        
         console.log('Import button handler attached');
     } else {
         console.error('confirmImportBtn not found!');
