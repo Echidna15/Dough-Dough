@@ -114,6 +114,8 @@ function loadProductsFromStorage() {
     const stored = localStorage.getItem(STORAGE_KEY);
     const products = stored ? JSON.parse(stored) : [];
     
+    console.log('Loading products:', products.length, 'found');
+    
     const sweetGrid = document.getElementById('sweet');
     const savoryGrid = document.getElementById('savory');
     
@@ -131,6 +133,8 @@ function loadProductsFromStorage() {
         savoryGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">No products available yet. Check back soon!</p>';
         return;
     }
+    
+    console.log('Products to display:', products);
     
     products.forEach(product => {
         const card = createProductCard(product);
