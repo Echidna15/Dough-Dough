@@ -84,7 +84,8 @@
         <p>Click the button below to automatically copy products from admin panel storage:</p>
         <button onclick="copyFromAdmin()">📋 Copy Products from Admin Panel</button>
         <textarea id="productData" placeholder="Paste product JSON data here, or use the copy button above..."></textarea>
-        <button onclick="importProducts()">Import Products</button>
+        <button onclick="importProducts()" id="importBtn">Import Products</button>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 5px;">After importing, refresh the main website page to see your products.</p>
         
         <h2>Step 2: Export Current Products</h2>
         <button onclick="exportProducts()">Export Products to Text</button>
@@ -105,7 +106,13 @@
         }
 
         function importProducts() {
-            const data = document.getElementById('productData').value.trim();
+            const textarea = document.getElementById('productData');
+            const data = textarea.value.trim();
+            
+            console.log('Import button clicked');
+            console.log('Data length:', data.length);
+            console.log('Data preview:', data.substring(0, 100));
+            
             if (!data) {
                 showStatus('Please paste product data first!', 'error');
                 return;
@@ -114,15 +121,31 @@
             try {
                 // Validate JSON
                 const products = JSON.parse(data);
+                console.log('Parsed products:', products);
+                
+                if (!Array.isArray(products)) {
+                    throw new Error('Data is not an array');
+                }
                 
                 // Save to both localStorage and sessionStorage
                 localStorage.setItem(STORAGE_KEY, data);
                 sessionStorage.setItem(STORAGE_KEY, data);
                 
-                showStatus(`Successfully imported ${products.length} product(s)!`, 'success');
+                // Verify save
+                const verify = localStorage.getItem(STORAGE_KEY);
+                if (!verify) {
+                    throw new Error('Failed to save to localStorage');
+                }
+                
+                console.log('Products saved successfully. Count:', products.length);
+                showStatus(`✅ Successfully imported ${products.length} product(s)! Refresh the main website to see them.`, 'success');
                 checkStorage();
+                
+                // Clear the textarea
+                textarea.value = '';
             } catch (e) {
-                showStatus('Error: Invalid JSON data. ' + e.message, 'error');
+                console.error('Import error:', e);
+                showStatus('Error: ' + e.message + '. Please check the console (F12) for details.', 'error');
             }
         }
 
