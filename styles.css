@@ -276,6 +276,12 @@ section {
     color: var(--white);
 }
 
+.refresh-btn {
+    margin-left: auto;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+}
+
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

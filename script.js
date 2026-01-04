@@ -223,6 +223,9 @@ function createProductCard(product) {
     return card;
 }
 
+// Refresh button
+let refreshBtn = null;
+
 // Load products when page loads
 window.addEventListener('DOMContentLoaded', () => {
     // Small delay to ensure DOM is fully ready
@@ -230,7 +233,20 @@ window.addEventListener('DOMContentLoaded', () => {
         loadProductsFromStorage();
     }, 50);
     
-    // Listen for storage changes (when admin panel updates products)
+    // Add refresh button listener
+    refreshBtn = document.getElementById('refreshProducts');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            loadProductsFromStorage();
+            // Show visual feedback
+            refreshBtn.textContent = '✓ Refreshed!';
+            setTimeout(() => {
+                refreshBtn.textContent = '🔄 Refresh';
+            }, 2000);
+        });
+    }
+    
+    // Listen for storage changes (when admin panel updates products in different tab)
     window.addEventListener('storage', (e) => {
         if (e.key === STORAGE_KEY) {
             console.log('Storage changed, reloading products...');
@@ -238,15 +254,16 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Also check periodically for changes (for same-window updates)
+    // Check periodically for changes
+    let lastKnownData = localStorage.getItem(STORAGE_KEY);
     setInterval(() => {
         const currentData = localStorage.getItem(STORAGE_KEY);
-        if (currentData && currentData !== lastKnownData) {
+        if (currentData !== lastKnownData) {
             console.log('Products updated, reloading...');
             loadProductsFromStorage();
             lastKnownData = currentData;
         }
-    }, 2000); // Check every 2 seconds
+    }, 1000); // Check every 1 second
     
     // Observe existing content sections
     document.querySelectorAll('.about-content, .contact-content').forEach(el => {
@@ -256,8 +273,6 @@ window.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
-
-let lastKnownData = localStorage.getItem(STORAGE_KEY);
 
 // Also listen for storage changes (in case admin panel updates products)
 window.addEventListener('storage', () => {
