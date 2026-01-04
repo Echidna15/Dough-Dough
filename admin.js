@@ -357,6 +357,74 @@ function deleteProduct(id) {
 }
 
 // Make functions globally available
+// Refresh Products Button
+const refreshProductsBtn = document.getElementById('refreshProductsBtn');
+if (refreshProductsBtn) {
+    refreshProductsBtn.addEventListener('click', () => {
+        loadProducts();
+        alert('Products list refreshed!');
+    });
+}
+
+// Import Products Modal
+const importModal = document.getElementById('importModal');
+const importProductsBtn = document.getElementById('importProductsBtn');
+const closeImportModal = document.getElementById('closeImportModal');
+const cancelImportBtn = document.getElementById('cancelImportBtn');
+const confirmImportBtn = document.getElementById('confirmImportBtn');
+const importData = document.getElementById('importData');
+
+if (importProductsBtn) {
+    importProductsBtn.addEventListener('click', () => {
+        importModal.classList.remove('hidden');
+    });
+}
+
+if (closeImportModal) {
+    closeImportModal.addEventListener('click', closeImportModalFunc);
+}
+
+if (cancelImportBtn) {
+    cancelImportBtn.addEventListener('click', closeImportModalFunc);
+}
+
+if (confirmImportBtn) {
+    confirmImportBtn.addEventListener('click', () => {
+        const data = importData.value.trim();
+        if (!data) {
+            alert('Please paste product data first!');
+            return;
+        }
+        
+        try {
+            const products = JSON.parse(data);
+            if (!Array.isArray(products)) {
+                throw new Error('Data is not an array');
+            }
+            
+            saveProducts(products);
+            alert(`Successfully imported ${products.length} product(s)!`);
+            closeImportModalFunc();
+            loadProducts();
+        } catch (e) {
+            alert('Error: ' + e.message);
+        }
+    });
+}
+
+if (importModal) {
+    importModal.addEventListener('click', (e) => {
+        if (e.target === importModal) {
+            closeImportModalFunc();
+        }
+    });
+}
+
+function closeImportModalFunc() {
+    if (importModal) importModal.classList.add('hidden');
+    if (importData) importData.value = '';
+}
+
 // Export Products Button
 const exportProductsBtn = document.getElementById('exportProductsBtn');
 if (exportProductsBtn) {
@@ -371,7 +439,7 @@ if (exportProductsBtn) {
         
         // Copy to clipboard
         navigator.clipboard.writeText(jsonData).then(() => {
-            alert(`✅ Copied ${products.length} product(s) to clipboard!\n\nNow go to the sync tool and paste it.`);
+            alert(`✅ Copied ${products.length} product(s) to clipboard!`);
         }).catch(() => {
             // Fallback: show in prompt
             prompt('Copy this data (Ctrl+C):', jsonData);

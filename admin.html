@@ -46,9 +46,27 @@
             <section class="admin-section">
                 <div class="section-header">
                     <h2>Manage Products</h2>
-                    <div style="display: flex; gap: 10px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button id="refreshProductsBtn" class="btn btn-secondary" title="Refresh products list">🔄 Refresh</button>
+                        <button id="importProductsBtn" class="btn btn-secondary" title="Import products">📥 Import</button>
                         <button id="exportProductsBtn" class="btn btn-secondary" title="Copy products data">📋 Export Products</button>
                         <button id="addProductBtn" class="btn btn-primary">+ Add New Product</button>
+                    </div>
+                </div>
+                
+                <!-- Import Modal -->
+                <div id="importModal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Import Products</h3>
+                            <button class="modal-close" id="closeImportModal">&times;</button>
+                        </div>
+                        <p>Paste product JSON data here:</p>
+                        <textarea id="importData" placeholder="Paste product JSON data here..." style="width: 100%; min-height: 200px; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; margin: 15px 0;"></textarea>
+                        <div class="form-actions">
+                            <button class="btn btn-secondary" id="cancelImportBtn">Cancel</button>
+                            <button class="btn btn-primary" id="confirmImportBtn">Import</button>
+                        </div>
                     </div>
                 </div>
 

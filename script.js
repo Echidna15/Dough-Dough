@@ -223,83 +223,12 @@ function createProductCard(product) {
     return card;
 }
 
-// Refresh button
-let refreshBtn = null;
-
-// Import Modal
-const importModal = document.getElementById('importModal');
-const importProductsBtn = document.getElementById('importProductsBtn');
-const closeImportModal = document.getElementById('closeImportModal');
-const cancelImportBtn = document.getElementById('cancelImportBtn');
-const confirmImportBtn = document.getElementById('confirmImportBtn');
-const importData = document.getElementById('importData');
-
 // Load products when page loads
 window.addEventListener('DOMContentLoaded', () => {
     // Small delay to ensure DOM is fully ready
     setTimeout(() => {
         loadProductsFromStorage();
     }, 50);
-    
-    // Add refresh button listener
-    refreshBtn = document.getElementById('refreshProducts');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            loadProductsFromStorage();
-            alert('Products refreshed!');
-        });
-    }
-    
-    // Import button
-    if (importProductsBtn) {
-        importProductsBtn.addEventListener('click', () => {
-            importModal.classList.remove('hidden');
-        });
-    }
-    
-    // Close import modal
-    if (closeImportModal) {
-        closeImportModal.addEventListener('click', closeImportModalFunc);
-    }
-    if (cancelImportBtn) {
-        cancelImportBtn.addEventListener('click', closeImportModalFunc);
-    }
-    
-    // Confirm import
-    if (confirmImportBtn) {
-        confirmImportBtn.addEventListener('click', () => {
-            const data = importData.value.trim();
-            if (!data) {
-                alert('Please paste product data first!');
-                return;
-            }
-            
-            try {
-                const products = JSON.parse(data);
-                if (!Array.isArray(products)) {
-                    throw new Error('Data is not an array');
-                }
-                
-                localStorage.setItem(STORAGE_KEY, data);
-                sessionStorage.setItem(STORAGE_KEY, data);
-                
-                alert(`Successfully imported ${products.length} product(s)!`);
-                closeImportModalFunc();
-                loadProductsFromStorage();
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
-        });
-    }
-    
-    // Close modal when clicking outside
-    if (importModal) {
-        importModal.addEventListener('click', (e) => {
-            if (e.target === importModal) {
-                closeImportModalFunc();
-            }
-        });
-    }
     
     // Observe existing content sections
     document.querySelectorAll('.about-content, .contact-content').forEach(el => {
@@ -309,11 +238,6 @@ window.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
-
-function closeImportModalFunc() {
-    importModal.classList.add('hidden');
-    importData.value = '';
-}
 
 // Also listen for storage changes (in case admin panel updates products)
 window.addEventListener('storage', () => {
