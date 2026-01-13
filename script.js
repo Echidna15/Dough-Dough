@@ -332,10 +332,56 @@ window.addEventListener('DOMContentLoaded', () => {
         cancelImportBtn.addEventListener('click', closeImportModalFunc);
     }
     
+    // Make handleImportClick available globally first
+    window.handleImportClick = function() {
+        console.log('=== HANDLE IMPORT CLICK (GLOBAL) ===');
+        const dataElement = document.getElementById('importData');
+        if (!dataElement) {
+            console.error('importData element not found');
+            alert('Error: Import textarea not found');
+            return;
+        }
+        
+        const data = dataElement.value.trim();
+        console.log('Data length:', data.length);
+        
+        if (!data) {
+            alert('Please paste product data first!');
+            return;
+        }
+        
+        try {
+            const products = JSON.parse(data);
+            if (!Array.isArray(products)) {
+                throw new Error('Data is not an array');
+            }
+            
+            const jsonString = JSON.stringify(products);
+            localStorage.setItem(STORAGE_KEY, jsonString);
+            sessionStorage.setItem(STORAGE_KEY, jsonString);
+            
+            // Create sync trigger
+            const syncData = {
+                timestamp: Date.now(),
+                productCount: products.length,
+                data: jsonString
+            };
+            localStorage.setItem('doughDoughSync', JSON.stringify(syncData));
+            sessionStorage.setItem('doughDoughSync', JSON.stringify(syncData));
+            
+            alert(`✅ Successfully imported ${products.length} product(s)!`);
+            if (importModal) importModal.classList.add('hidden');
+            if (importData) importData.value = '';
+            loadProductsFromStorage();
+        } catch (e) {
+            console.error('Import error:', e);
+            alert('Error: ' + e.message);
+        }
+    };
+    
     // Confirm import - use multiple methods to ensure it works
     if (confirmImportBtn) {
         console.log('Setting up import button handler');
-        console.log('Button element:', confirmImportBtn);
         
         // Method 1: onclick attribute (already in HTML)
         // Method 2: addEventListener
@@ -343,14 +389,8 @@ window.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation();
             console.log('Import button clicked via addEventListener!');
-            handleImportClick();
-        });
-        
-        // Method 3: mousedown as backup
-        confirmImportBtn.addEventListener('mousedown', function(e) {
-            e.preventDefault();
-            console.log('Import button mousedown!');
-        });
+            window.handleImportClick();
+        }, false);
         
         console.log('Import button handler attached');
     } else {
