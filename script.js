@@ -244,9 +244,36 @@ window.addEventListener('DOMContentLoaded', () => {
     refreshBtn = document.getElementById('refreshProducts');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
-            console.log('Refresh button clicked');
+            console.log('=== REFRESH BUTTON CLICKED ===');
             const beforeCount = document.querySelectorAll('.product-card').length;
             console.log('Products before refresh:', beforeCount);
+            
+            // Check sync trigger first
+            const syncData = localStorage.getItem('doughDoughSync') || sessionStorage.getItem('doughDoughSync');
+            if (syncData) {
+                try {
+                    const sync = JSON.parse(syncData);
+                    if (sync.data) {
+                        console.log('Found sync data, loading...');
+                        localStorage.setItem(STORAGE_KEY, sync.data);
+                        sessionStorage.setItem(STORAGE_KEY, sync.data);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sync data:', e);
+                }
+            }
+            
+            // Force reload from storage
+            const stored = localStorage.getItem(STORAGE_KEY);
+            const sessionStored = sessionStorage.getItem(STORAGE_KEY);
+            console.log('localStorage data:', stored ? stored.length + ' chars' : 'null');
+            console.log('sessionStorage data:', sessionStored ? sessionStored.length + ' chars' : 'null');
+            
+            if (!stored && !sessionStored) {
+                alert('No products found in storage!\n\nTo sync products:\n1. Go to Admin Panel\n2. Click "📋 Export Products"\n3. Come back here and click "📥 Import"\n4. Paste the data');
+                return;
+            }
+            
             loadProductsFromStorage();
             const afterCount = document.querySelectorAll('.product-card').length;
             console.log('Products after refresh:', afterCount);
@@ -258,12 +285,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 refreshBtn.textContent = originalText;
             }, 2000);
             
-            // Alert if no products found
-            if (afterCount === 0) {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                if (!stored) {
-                    alert('No products found in storage.\n\nPlease:\n1. Go to Admin Panel\n2. Click "📋 Export Products"\n3. Click "📥 Import" button here\n4. Paste the data');
-                }
+            if (afterCount > 0) {
+                alert(`✅ Loaded ${afterCount} product(s)!`);
+            } else if (stored || sessionStored) {
+                alert('⚠️ Products found in storage but failed to display. Check console for errors.');
             }
         });
     }
@@ -403,16 +428,28 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Check periodically for changes
-    let lastKnownData = localStorage.getItem(STORAGE_KEY);
+    // Check periodically for changes using sync trigger
+    let lastSyncTime = 0;
     setInterval(() => {
-        const currentData = localStorage.getItem(STORAGE_KEY);
-        if (currentData !== lastKnownData) {
-            console.log('Products updated, reloading...');
-            loadProductsFromStorage();
-            lastKnownData = currentData;
+        try {
+            const syncData = localStorage.getItem('doughDoughSync') || sessionStorage.getItem('doughDoughSync');
+            if (syncData) {
+                const sync = JSON.parse(syncData);
+                if (sync.timestamp > lastSyncTime) {
+                    console.log('Sync detected! Reloading products...', sync);
+                    lastSyncTime = sync.timestamp;
+                    // Load the data from sync
+                    if (sync.data) {
+                        localStorage.setItem(STORAGE_KEY, sync.data);
+                        sessionStorage.setItem(STORAGE_KEY, sync.data);
+                    }
+                    loadProductsFromStorage();
+                }
+            }
+        } catch (e) {
+            // Ignore sync errors
         }
-    }, 1000); // Check every 1 second
+    }, 500); // Check every 0.5 seconds
     
     // Observe existing content sections
     document.querySelectorAll('.about-content, .contact-content').forEach(el => {

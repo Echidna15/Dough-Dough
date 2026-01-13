@@ -252,7 +252,19 @@ function saveProduct() {
             return;
         }
         
-        alert(`Product saved successfully!\n\n⚠️ Remember to refresh the main website page to see your changes.`);
+        // Also save to sessionStorage for better compatibility
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+        
+        // Create a sync trigger by updating a timestamp
+        const syncData = {
+            timestamp: Date.now(),
+            productCount: products.length,
+            data: JSON.stringify(products)
+        };
+        localStorage.setItem('doughDoughSync', JSON.stringify(syncData));
+        sessionStorage.setItem('doughDoughSync', JSON.stringify(syncData));
+        
+        alert(`✅ Product saved successfully!\n\n📋 Quick Sync:\n1. Click "📋 Export Products" (copies data)\n2. Go to main website\n3. Click "📥 Import" → Paste → Import\n\nOr just click "🔄 Refresh" on main website.`);
         closeProductModal();
         loadProducts();
     } catch (error) {
