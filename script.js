@@ -332,28 +332,32 @@ window.addEventListener('DOMContentLoaded', () => {
         cancelImportBtn.addEventListener('click', closeImportModalFunc);
     }
     
-    // Confirm import
+    // Confirm import - use multiple methods to ensure it works
     if (confirmImportBtn) {
         console.log('Setting up import button handler');
         console.log('Button element:', confirmImportBtn);
-        console.log('Button style:', window.getComputedStyle(confirmImportBtn));
         
-        // Test click
-        confirmImportBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Import button clicked via onclick!');
-            handleImport();
-        };
-        
+        // Method 1: onclick attribute (already in HTML)
+        // Method 2: addEventListener
         confirmImportBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             console.log('Import button clicked via addEventListener!');
-            handleImport();
-        }, true); // Use capture phase
+            handleImportClick();
+        });
         
-        function handleImport() {
+        // Method 3: mousedown as backup
+        confirmImportBtn.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            console.log('Import button mousedown!');
+        });
+        
+        console.log('Import button handler attached');
+    } else {
+        console.error('confirmImportBtn not found!');
+    }
+    
+    function handleImportClick() {
             
             const dataElement = document.getElementById('importData');
             if (!dataElement) {
