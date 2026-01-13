@@ -81,10 +81,11 @@
                         <button type="button" class="import-modal-close" id="closeImportModal">&times;</button>
                     </div>
                     <p>1. Go to Admin Panel → Click "📋 Export Products"<br>2. Paste the data below:</p>
-                    <textarea id="importData" placeholder="Paste product JSON data here..."></textarea>
+                    <textarea id="importData" placeholder="Paste product JSON data here..." onkeydown="if(event.key==='Enter' && event.ctrlKey) handleImportClick();"></textarea>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">💡 Tip: Press Ctrl+Enter in the textarea to import</p>
                     <div class="import-modal-actions">
                         <button type="button" class="btn btn-secondary" id="cancelImportBtn">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmImportBtn" onclick="handleImportClick()">Import</button>
+                        <button type="button" class="btn btn-primary" id="confirmImportBtn" onclick="handleImportClick(); return false;">Import</button>
                     </div>
                 </div>
             </div>
